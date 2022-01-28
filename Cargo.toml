@@ -1,0 +1,13 @@
+[package]
+name = "huffman"
+version = "0.1.0"
+edition = "2021"
+readme = "README.md"
+authors = ["PrototypeRailGun"]
+license = "MIT"
+description = "Simple Huffman coding console application"
+homepage = "https://github.com/PrototypeRailGun/SimpleHuffman"
+repository = "https://github.com/PrototypeRailGun/SimpleHuffman"
+
+
+[dependencies]
