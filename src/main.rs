@@ -19,7 +19,7 @@ fn main() {
             }
         }
         Mode::Decompress => {
-            if let Err(e) = compress::run(&config) {
+            if let Err(e) = decompress::run(&config) {
                 eprintln!("Decompression error: {}", e);
             }
         }
