@@ -77,27 +77,36 @@ fn write_codes(
 ) -> Result<(), Box<dyn Error>> {
     let inp_file = File::open(&config.inpfname)?;
     let mut buf_reader = BufReader::new(inp_file);
+    buf_reader.consume(buf_reader.capacity());
     buf_reader.fill_buf()?;
 
     let mut packed_codes: u8 = 0;
     let mut num_bits: u8 = 0;
 
-    for byte in buf_reader.buffer().iter() {
-        for bit in code_map.get(*byte as usize).unwrap() {
-            if num_bits == 8 {
-                out_buf.write(&[packed_codes])?;
-                packed_codes = 0;
-                num_bits = 0;
+    loop {
+        for byte in buf_reader.buffer().iter() {
+            for bit in code_map.get(*byte as usize).unwrap() {
+                if num_bits == 8 {
+                    out_buf.write(&[packed_codes])?;
+                    packed_codes = 0;
+                    num_bits = 0;
+                }
+                packed_codes += packed_codes + bit;
+                num_bits += 1;
             }
-            packed_codes += packed_codes + bit;
-            num_bits += 1;
         }
-    }
 
-    // Since the last byte written to the file contains garbage padding bits,
-    // we will write their number to the file
-    if num_bits > 0 {
-        out_buf.write(&[8 - num_bits])?;
+        buf_reader.consume(buf_reader.capacity());
+        buf_reader.fill_buf()?;
+        if buf_reader.buffer().is_empty() {
+            // Since the last byte written to the file contains garbage padding bits,
+            // we will write their number to the file
+            if num_bits > 0 {
+                out_buf.write(&[packed_codes])?;
+            }
+            out_buf.write(&[8 - num_bits])?;
+            break;
+        }
     }
 
     Ok(())
