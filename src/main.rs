@@ -3,6 +3,7 @@ use std::process;
 mod compress;
 mod config;
 mod decompress;
+mod tree;
 
 use config::{Config, Mode};
 
